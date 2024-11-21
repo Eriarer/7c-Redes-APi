@@ -106,6 +106,17 @@ class JsonDatabase {
             return filterCondition.in.includes(value)
           }
 
+          // Case-insensitive, wildcard-like search
+          if (filterCondition.like !== undefined) {
+            if (typeof value !== 'string') return false
+
+            // Convert both to lowercase for case-insensitive search
+            const searchTerm = filterCondition.like.toLowerCase()
+            const docValue = value.toLowerCase()
+
+            return docValue.includes(searchTerm)
+          }
+
           return true
         })
       )
@@ -115,17 +126,63 @@ class JsonDatabase {
   }
 
   async compareValues(a, b, operator) {
-    // Convert to Date if both are date-like strings
+    // Helper function to normalize numeric strings with leading zeros
+    const normalizeValue = (val) => {
+      if (typeof val === 'string' && /^0+\d+$/.test(val)) {
+        return val // Keep leading zeros for strict ASCII comparison
+      }
+      return val
+    }
+
+    // Normalize the input values
+    a = normalizeValue(a)
+    b = normalizeValue(b)
+
+    // Helper function to check if a value is a valid date string
     const isDateString = (val) => {
+      if (typeof val !== 'string') return false
       const date = new Date(val)
-      return !isNaN(date.getTime()) && typeof val === 'string'
+      return !isNaN(date.getTime())
     }
 
+    // Helper function to check if a value can be treated as a number
+    const isNumeric = (val) => {
+      return !isNaN(parseFloat(val)) && isFinite(val)
+    }
+
+    // 1. Compare as dates if both values are valid date strings
     if (isDateString(a) && isDateString(b)) {
-      a = new Date(a)
-      b = new Date(b)
+      const dateA = new Date(a)
+      const dateB = new Date(b)
+      switch (operator) {
+        case '<':
+          return dateA < dateB
+        case '<=':
+          return dateA <= dateB
+        case '>':
+          return dateA > dateB
+        case '>=':
+          return dateA >= dateB
+      }
     }
 
+    // 2. Compare as numbers if both values are numeric
+    if (isNumeric(a) && isNumeric(b)) {
+      const numA = parseFloat(a)
+      const numB = parseFloat(b)
+      switch (operator) {
+        case '<':
+          return numA < numB
+        case '<=':
+          return numA <= numB
+        case '>':
+          return numA > numB
+        case '>=':
+          return numA >= numB
+      }
+    }
+
+    // 3. Compare as strings using ASCII order
     switch (operator) {
       case '<':
         return a < b
@@ -136,7 +193,7 @@ class JsonDatabase {
       case '>=':
         return a >= b
       default:
-        return false
+        throw new Error(`Invalid operator: ${operator}`)
     }
   }
 

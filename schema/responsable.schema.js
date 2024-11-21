@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
-export const ResponsableSchema = z.object({
-  id_responsable: z
+export const addResponsableSchema = z.object({
+  id: z
     .string({
       required_error: 'El id del responsable es requerido'
     })
@@ -18,7 +18,7 @@ export const ResponsableSchema = z.object({
 })
 
 export const UpdateResponsableSchema = z.object({
-  id_responsable: z.string().max(6),
+  id: z.string().max(6),
   nombre: z.string().max(60),
   tipo: z.enum(['E', 'P', 'A'], {
     invalid_type_error: 'El tipo de responsable debe ser una cadena de texto'
