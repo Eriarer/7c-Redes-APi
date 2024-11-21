@@ -11,7 +11,8 @@ export const addUsuario = async (req, res) => {
     const newUser = await db.saveDocument('usuarios', {
       idusuario,
       tipo,
-      nombre
+      nombre,
+      activo: true
     })
     res.status(201).json({ status: 'success', data: newUser })
   } catch (error) {
@@ -53,7 +54,7 @@ export const updateUsuario = async (req, res) => {
     if (nombre) updateData.nombre = nombre
 
     if (Object.keys(updateData).length === 0) {
-      return res.status(400).json({ error: 'Request body is empty' })
+      return res.status(400).json({ error: 'Request is empty' })
     }
 
     const updatedUser = await db.updateDocument('usuarios', id, updateData)
