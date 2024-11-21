@@ -75,33 +75,33 @@ export const getUsuarios = async (req, res) => {
 
 export const getUsuariosFiltered = async (req, res) => {
   const { idinf, idsup, nombre, tipo } = req.body
-  try {
-    const filters = {}
 
-    if (idinf) filters.idusuario = { egt: idinf }
-    if (idsup)
-      filters.idusuario = {
-        ...(filters.idusuario || {}),
+  try {
+    // Construct the filter object dynamically
+    const filter = {}
+
+    if (idinf) {
+      filter.idusuario = { egt: idinf }
+    }
+
+    if (idsup) {
+      filter.idusuario = {
+        ...filter.idusuario,
         elt: idsup
       }
+    }
 
     if (nombre) {
-      filters.nombre = {
-        search: {
-          value: nombre,
-          case_sensitive: case_sensitive || false
-        }
-      }
+      filter.nombre = { like: nombre }
     }
 
     if (tipo) {
-      const tipos = tipo.split(',').map((t) => t.trim())
-      filters.tipo = { in: tipos }
+      filter.tipo = { in: tipo.split(',').map((t) => t.trim()) }
     }
+    console.log(filter)
 
-    const filteredUsers = await db.queryDocuments('usuarios', filters)
-
-    filteredUsers.sort((a, b) => a.idusuario.localeCompare(b.idusuario))
+    // Assuming this is a method of a class that manages documents
+    const filteredUsers = await db.queryDocuments('usuarios', filter)
 
     res.status(200).json(filteredUsers)
   } catch (error) {

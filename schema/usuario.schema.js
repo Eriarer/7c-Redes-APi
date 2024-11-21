@@ -11,9 +11,9 @@ export const addUsuarioSchema = z.object({
       required_error: 'Tipo es requerido',
       invalid_type_error: 'Tipo debe ser un string'
     })
-    .min(1)
-    .max(1)
-    .regex(/^[MAEP]$/),
+    .min(1, { message: 'Tipo debe tener al menos 1 caracter' })
+    .max(1, { message: 'Tipo debe tener máximo 1 caracter' })
+    .regex(/^[MAEP]$/, { message: 'Tipo debe ser M, A, E o P' }),
   nombre: z
     .string({
       required_error: 'Nombre es requerido',
