@@ -1,6 +1,9 @@
 import express from 'express'
 import { validateSchema } from '../middleware/validateSchema.middleware.js'
-import { addUsuarioSchema } from '../schema/usuario.schema.js'
+import {
+  addUsuarioSchema,
+  updateUsuarioSchema
+} from '../schema/usuario.schema.js'
 import {
   addUsuario,
   deleteUsuario,
@@ -18,7 +21,7 @@ router.post('/', validateSchema(addUsuarioSchema), addUsuario)
 router.delete('/:id', deleteUsuario)
 router.delete('/', deleteUsuarios)
 
-router.patch('/:id', updateUsuario)
+router.patch('/:id', validateSchema(updateUsuario), updateUsuario)
 
 router.get('/find', getUsuarios)
 router.get('/query', getUsuariosFiltered)
