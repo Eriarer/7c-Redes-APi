@@ -1,14 +1,15 @@
 import JsonDatabase from '../db/db.js'
-import { appConfig } from '../config.js'
+import { appConfig } from '../config/config.js'
+import { collections } from '../config/colletion.names.config.js'
 
 const db = new JsonDatabase(appConfig.dbDirectory)
 await db.init()
-await db.createCollection('usuarios')
+await db.createCollection(collections.usuario)
 
 export const addUsuario = async (req, res) => {
   const { idusuario, tipo, nombre } = req.body
   try {
-    const newUser = await db.saveDocument('usuarios', {
+    const newUser = await db.saveDocument(collections.usuario, {
       idusuario,
       tipo,
       nombre,
@@ -24,7 +25,7 @@ export const deleteUsuarios = async (req, res) => {
   const { ids } = req.body
   try {
     const deletedUsers = await Promise.all(
-      ids.map((id) => db.deleteDocument('usuarios', id))
+      ids.map((id) => db.deleteDocument(collections.usuario, id))
     )
     res.status(200).json(deletedUsers)
   } catch (error) {
@@ -35,7 +36,7 @@ export const deleteUsuarios = async (req, res) => {
 export const deleteUsuario = async (req, res) => {
   const { id } = req.params
   try {
-    const result = await db.deleteDocument('usuarios', id)
+    const result = await db.deleteDocument(collections.usuario, id)
     res.status(200).json({ deleted: result })
   } catch (error) {
     res.status(500).json({ error: error.message })
@@ -57,7 +58,11 @@ export const updateUsuario = async (req, res) => {
       return res.status(400).json({ error: 'Request is empty' })
     }
 
-    const updatedUser = await db.updateDocument('usuarios', id, updateData)
+    const updatedUser = await db.updateDocument(
+      collections.usuario,
+      id,
+      updateData
+    )
     res.status(200).json(updatedUser)
   } catch (error) {
     res.status(500).json({ error: error.message })
@@ -66,7 +71,7 @@ export const updateUsuario = async (req, res) => {
 
 export const getUsuarios = async (req, res) => {
   try {
-    const users = await db.queryDocuments('usuarios')
+    const users = await db.queryDocuments(collections.usuario)
     res.status(200).json(users)
   } catch (error) {
     res.status(500).json({ error: error.message })
@@ -101,7 +106,7 @@ export const getUsuariosFiltered = async (req, res) => {
     console.log(filter)
 
     // Assuming this is a method of a class that manages documents
-    const filteredUsers = await db.queryDocuments('usuarios', filter)
+    const filteredUsers = await db.queryDocuments(collections.usuario, filter)
 
     res.status(200).json(filteredUsers)
   } catch (error) {
@@ -112,7 +117,7 @@ export const getUsuariosFiltered = async (req, res) => {
 export const getUsuarioById = async (req, res) => {
   const { id } = req.params
   try {
-    const user = await db.getDocument('usuarios', id)
+    const user = await db.getDocument(collections.usuario, id)
     res.status(200).json(user ? [user] : [])
   } catch (error) {
     res.status(500).json({ error: error.message })
