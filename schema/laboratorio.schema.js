@@ -1,51 +1,56 @@
-import { z } from 'zod'
+import { z } from 'zod';
 
-export const LaboratorioSchema = z.object({
-  id_lab: z
-    .string({
-      required_error: 'El id del laboratorio es requerido'
-    })
-    .max(6, 'El id del laboratorio debe tener a lo sumo 6 caracteres'),
+export const addLaboratorioSchema = z.object({
   plantel: z
-    .string({
-      required_error: 'El plantel es requerido'
-    })
-    .max(4, 'El plantel debe tener a lo sumo 4 caracteres'),
+    .string({ message: 'Plantel es requerido' })
+    .min(1, { message: 'Plantel debe tener al menos 1 carácter' })
+    .max(50, { message: 'Plantel no puede exceder 50 caracteres' }),
   num_ed: z
-    .string({
-      required_error: 'El número de edificio es requerido'
-    })
-    .max(4, 'El número de edificio debe tener a lo sumo 4 caracteres'),
+    .number({ message: 'Número de edificio es requerido' })
+    .int({ message: 'Número de edificio debe ser un entero' })
+    .positive({ message: 'Número de edificio debe ser mayor a 0' }),
   aula: z
-    .string({
-      required_error: 'El aula es requerida'
-    })
-    .max(6, 'El aula debe tener a lo sumo 6 caracteres'),
+    .string()
+    .max(6, { message: 'Aula no puede exceder 6 caracteres' })
+    .optional(),
   departamento: z
-    .string({
-      required_error: 'El departamento es requerido'
-    })
-    .max(80, 'El departamento debe tener a lo sumo 80 caracteres'),
+    .string({ message: 'Departamento es requerido' })
+    .min(1, { message: 'Departamento debe tener al menos 1 carácter' })
+    .max(80, { message: 'Departamento no puede exceder 80 caracteres' }),
   cupo: z
-    .string({
-      required_error: 'El cupo es requerido'
-    })
-    .max(2, 'El cupo debe tener a lo sumo 2 caracteres'),
-  activo: z.boolean().default(true)
-})
+    .number({ message: 'Cupo es requerido' })
+    .int({ message: 'Cupo debe ser un número entero' })
+    .positive({ message: 'Cupo debe ser mayor a 0' })
+    .default(1)
+});
 
-export const UpdateLaboratorioSchema = z.object({
-  id_lab: z
-    .string({})
-    .max(6, 'El id del laboratorio debe tener a lo sumo 6 caracteres'),
-  plantel: z.string({}).max(4, 'El plantel debe tener a lo sumo 4 caracteres'),
+export const updateLaboratorioSchema = z
+.object({
+  idlaboratorio: z
+    .number()
+    .int({ message: 'Id debe ser un número entero' })
+    .positive({ message: 'Id debe ser mayor a 0' })
+    .optional(),
+  plantel: z
+    .string()
+    .min(1, { message: 'Plantel debe tener al menos 1 carácter' })
+    .max(50, { message: 'Plantel no puede exceder 50 caracteres' })
+    .optional(),
   num_ed: z
-    .string({})
-    .max(4, 'El número de edificio debe tener a lo sumo 4 caracteres'),
-  aula: z.string({}).max(6, 'El aula debe tener a lo sumo 6 caracteres'),
+    .number()
+    .int({ message: 'Número de edificio debe ser un entero' })
+    .positive({ message: 'Número de edificio debe ser mayor a 0' })
+    .optional(),
+  aula: z.string().max(6, { message: 'Aula no puede exceder 6 caracteres' }).optional(),
   departamento: z
-    .string({})
-    .max(80, 'El departamento debe tener a lo sumo 80 caracteres'),
-  cupo: z.string({}).max(2, 'El cupo debe tener a lo sumo 2 caracteres'),
-  activo: z.boolean()
+    .string()
+    .min(1, { message: 'Departamento debe tener al menos 1 carácter' })
+    .max(80, { message: 'Departamento no puede exceder 80 caracteres' })
+    .optional(),
+  cupo: z
+    .number()
+    .int({ message: 'Cupo debe ser un número entero' })
+    .positive({ message: 'Cupo debe ser mayor a 0' })
+    .optional()
 })
+.partial();

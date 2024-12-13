@@ -1,35 +1,34 @@
 import { z } from 'zod'
 
 export const addEquipoSchema = z.object({
-  id_equipo: z
-    .string({
-      required_error: 'El id del equipo es requerido'
-    })
-    .max(6, 'El id del equipo debe tener a lo sumo 6 caracteres'),
   nombre: z
-    .string({
-      required_error: 'El nombre del equipo es requerido'
-    })
-    .max(45, 'El nombre del equipo debe tener a lo sumo 20 caracteres'),
+    .string({ message: 'El nombre es requerido' })
+    .min(4, { message: 'El nombre debe tener al menos 4 caracteres' })
+    .max(45, { message: 'El nombre no puede exceder 45 caracteres' }),
   descripcion: z
-    .string({
-      required_error: 'La descripción del equipo es requerida'
-    })
-    .max(200, 'La descripción del equipo debe tener a lo sumo 100 caracteres'),
-  disponible: z.boolean().default(true).optional()
+    .string()
+    .max(200, { message: 'La descripción no puede exceder 200 caracteres' })
+    .optional(),
+  disponible: z
+    .boolean().optional()
 })
 
-export const updateEquipoSchema = z.object({
-  id_equipo: z
-    .string({})
-    .max(6, 'El id del equipo debe tener a lo sumo 6 caracteres')
-    .optional(),
-  nombre: z
-    .string({})
-    .max(45, 'El nombre del equipo debe tener a lo sumo 20 caracteres')
-    .optional(),
-  descripcion: z
-    .string({})
-    .max(200, 'La descripción del equipo debe tener a lo sumo 100 caracteres'),
-  disponible: z.boolean().optional()
-})
+export const updateEquipoSchema = z
+  .object({
+    idequipo: z
+      .string()
+      .regex(/^[0-9]+$/, { message: 'El ID debe ser un número entero' })
+      .optional(),
+    nombre: z
+      .string()
+      .min(4, { message: 'El nombre debe tener al menos 4 caracteres' })
+      .max(45, { message: 'El nombre no puede exceder 45 caracteres' })
+      .optional(),
+    descripcion: z
+      .string()
+      .max(200, { message: 'La descripción no puede exceder 200 caracteres' })
+      .optional(),
+    disponible: z
+      .boolean().optional()
+  })
+  .partial()

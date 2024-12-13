@@ -1,27 +1,38 @@
-import { z } from 'zod'
+import { z } from 'zod';
 
 export const addResponsableSchema = z.object({
-  id: z
-    .string({
-      required_error: 'El id del responsable es requerido'
-    })
-    .max(6),
+  idresponsable: z
+    .string({ message: 'El ID del responsable es requerido' })
+    .min(1, { message: 'El ID debe tener al menos 1 carácter' })
+    .max(60, { message: 'El ID no puede exceder 60 caracteres' }),
   nombre: z
-    .string({
-      required_error: 'El nombre del responsable es requerido'
-    })
-    .max(60),
-  tipo: z.enum(['E', 'P', 'A'], {
-    required_error: 'El tipo de responsable es requerido'
-  }),
-  activo: z.boolean().default(true)
-})
+    .string({ message: 'El nombre es requerido' })
+    .min(1, { message: 'El nombre debe tener al menos 1 carácter' })
+    .max(60, { message: 'El nombre no puede exceder 60 caracteres' }),
+  tipo: z
+    .string({ message: 'El tipo es requerido' })
+    .regex(/^[EPA]$/, { message: 'El tipo debe ser "E", "P" o "A"' }),
+  activo: z
+    .boolean()
+    .default(true)
+});
 
-export const UpdateResponsableSchema = z.object({
-  id: z.string().max(6),
-  nombre: z.string().max(60),
-  tipo: z.enum(['E', 'P', 'A'], {
-    invalid_type_error: 'El tipo de responsable debe ser una cadena de texto'
-  }),
-  activo: z.boolean()
-})
+export const updateResponsableSchema = z
+  .object({
+    idresponsable: z
+      .string()
+      .min(1, { message: 'El ID debe tener al menos 1 carácter' })
+      .max(60, { message: 'El ID no puede exceder 60 caracteres' })
+      .optional(),
+    nombre: z
+      .string()
+      .min(1, { message: 'El nombre debe tener al menos 1 carácter' })
+      .max(60, { message: 'El nombre no puede exceder 60 caracteres' })
+      .optional(),
+    tipo: z
+      .string()
+      .regex(/^[EPA]$/, { message: 'El tipo debe ser "E", "P" o "A"' })
+      .optional(),
+    activo: z.boolean().optional()
+  })
+  .partial();
