@@ -1,9 +1,10 @@
 import JsonDatabase from '../db/db.js'
-import { appConfig } from '../config.js'
+import { appConfig } from '../config/config.js'
+import { collections } from '../config/colletion.names.config.js'
 
 const db = new JsonDatabase(appConfig.dbDirectory)
 await db.init()
-await db.createCollection('usuarios')
+await db.createCollection(collections.usuario)
 
 export const addUsuario = async (req, res) => {
   const { idusuario, nombre, apellido, carrera, correo, tipo, activo } =
@@ -83,10 +84,7 @@ export const getUsuarioById = async (req, res) => {
   const { id } = req.params
   try {
     const user = await db.getDocument('usuarios', id)
-    if (!user) {
-      throw new Error('No se encontró el usuario')
-    }
-    res.status(200).json({ status: 'success', data: user })
+    res.status(200).json(user ? [user] : [])
   } catch (error) {
     res.status(500).json({ error: error.message })
   }
