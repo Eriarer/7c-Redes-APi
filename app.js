@@ -12,7 +12,7 @@ app.use(express.urlencoded({ extended: true }))
 app.use(morgan('dev'))
 app.use(cors())
 
-app.use('/glem/usuario', usuarioRoutes)
-app.use('/glem/responsable', respobnsableRoutes)
+app.use('/usuario', usuarioRoutes)
+app.use('/responsable', respobnsableRoutes)
 
 export default app
