@@ -10,12 +10,13 @@ await db.createCollection(collections.usuario)
 
 export const login = async (req, res) => {
   const { correo, password } = req.body
+  console.log(req.body)
   try {
-    const users = await db.getAllDocuments('usuarios', { correo })
+    const users = await db.getAllDocuments(collections.usuario)
     if (users.length === 0) {
       return res.status(400).json({ error: 'Correo o contraseña incorrecta' })
     }
-    const user = users[0]
+    const user = users.find((user) => user.correo === correo)
     if (!user.activo) {
       return res.status(400).json({
         error: 'No puedes ingresar con esta cuenta, esta desactivada.'
@@ -25,6 +26,7 @@ export const login = async (req, res) => {
       return res.status(400).json({ error: 'Correo o contraseña incorrecta' })
     }
     const token = generateToken(user)
+    console.log('token generado')
     const data = {
       idusuario: user.idusuario,
       nombre: user.nombre,
