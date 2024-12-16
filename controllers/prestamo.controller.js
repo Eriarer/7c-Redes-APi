@@ -1,6 +1,7 @@
 import JsonDatabase from '../db/db.js'
 import { appConfig } from '../config/config.js'
 import { collections } from '../config/colletion.names.config.js'
+import { senConfirmationEmail } from '../lib/mailer.js'
 
 const db = new JsonDatabase(appConfig.dbDirectory)
 await db.init()
@@ -65,6 +66,12 @@ export const addPrestamo = async (req, res) => {
       })
     }
 
+    try {
+      prepareEmail(newPrestamo)
+    } catch (error) {
+      console.error('Error al enviar email:', error)
+    }
+
     res.status(201).json({
       status: 'success',
       message: 'Prestamo agregado exitosamente',
@@ -78,6 +85,33 @@ export const addPrestamo = async (req, res) => {
       message: 'Algo ha salido mal, inténtalo más tarde'
     })
   }
+}
+
+const prepareEmail = async (prestamo) => {
+  const users = await db.getAllDocuments(collections.usuario)
+  const user = users.find((user) => user.idusuario == prestamo.idusuario)
+  const laboratorio = await db.getDocument(
+    collections.laboratorio,
+    prestamo.idlaboratorio
+  )
+
+  const prestamoInfo = {
+    nombre: user.nombre + ' ' + user.apellido ?? '',
+    fecha: prestamo.fecha,
+    horainicio: prestamo.horainicio,
+    duracion: prestamo.duracion,
+    observaciones: prestamo.observaciones ?? null,
+    estado: 'Pendiente',
+    laboratorio:
+      laboratorio.departamento +
+      '-' +
+      laboratorio.num_ed +
+      (laboratorio.aula ?? '') +
+      ' ' +
+      (laboratorio.descripcion ?? '')
+  }
+
+  senConfirmationEmail(user.correo, prestamoInfo, user.nombre)
 }
 
 export const getPrestamos = async (req, res) => {
