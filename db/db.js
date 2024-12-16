@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from 'uuid'
 class JsonDatabase {
   constructor(dbPath = './DB') {
     this.dbPath = path.resolve(dbPath)
+    this.collections = new Set()
   }
 
   async init() {
@@ -13,21 +14,32 @@ class JsonDatabase {
 
   async createCollection(name) {
     const collectionPath = path.join(this.dbPath, name)
-    await fs.mkdir(collectionPath, { recursive: true })
+
+    if (!this.collections.has(name)) {
+      await fs.mkdir(collectionPath, { recursive: true })
+      this.collections.add(name)
+    }
+  }
+
+  async _writeJsonFile(filePath, data) {
+    const jsonData = JSON.stringify(data, null, 2)
+    await fs.writeFile(filePath, jsonData)
   }
 
   async saveDocument(collection, data, id = uuidv4()) {
     await this.createCollection(collection)
+
     const documentPath = path.join(this.dbPath, collection, `${id}.json`)
+    const now = new Date().toISOString()
 
     const documentData = {
       _id: id,
       ...data,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      createdAt: now,
+      updatedAt: now
     }
 
-    await fs.writeFile(documentPath, JSON.stringify(documentData, null, 2))
+    await this._writeJsonFile(documentPath, documentData)
     return documentData
   }
 
@@ -37,38 +49,36 @@ class JsonDatabase {
       const rawData = await fs.readFile(documentPath, 'utf-8')
       return JSON.parse(rawData)
     } catch (error) {
-      return null
+      if (error.code === 'ENOENT') return null
+      throw error
     }
   }
 
   async updateDocument(collection, id, updateData) {
     const documentPath = path.join(this.dbPath, collection, `${id}.json`)
 
-    try {
-      const existingDoc = await this.getDocument(collection, id)
-      if (!existingDoc) return null
+    const existingDoc = await this.getDocument(collection, id)
+    if (!existingDoc) return null
 
-      const updatedDoc = {
-        ...existingDoc,
-        ...updateData,
-        updatedAt: new Date().toISOString()
-      }
-
-      await fs.writeFile(documentPath, JSON.stringify(updatedDoc, null, 2))
-      return updatedDoc
-    } catch (error) {
-      return null
+    const updatedDoc = {
+      ...existingDoc,
+      ...updateData,
+      updatedAt: new Date().toISOString()
     }
+
+    await this._writeJsonFile(documentPath, updatedDoc)
+    return updatedDoc
   }
 
   async deleteDocument(collection, id) {
     const documentPath = path.join(this.dbPath, collection, `${id}.json`)
-
     try {
       await fs.unlink(documentPath)
       return true
     } catch (error) {
-      return false
+      // Retornar false si no existe el archivo
+      if (error.code === 'ENOENT') return false
+      throw error
     }
   }
 }
