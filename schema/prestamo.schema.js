@@ -1,10 +1,7 @@
 import { z } from 'zod'
 
 export const addPrestamoSchema = z.object({
-  idlaboratorio: z
-    .number({ message: 'El Id de laboratorio es requerido' })
-    .int({ message: 'El Id de laboratorio debe ser un número entero' })
-    .positive({ message: 'El Id de laboratorio debe ser mayor a 0' }),
+  idlaboratorio: z.string({ message: 'El Id de laboratorio es requerido' }),
   idusuario: z
     .number({ message: 'El Id de usuario es requerido' })
     .int({ message: 'El Id de usuario debe ser un número entero' })
@@ -40,11 +37,7 @@ export const addPrestamoSchema = z.object({
 
 export const updatePrestamoSchema = z
   .object({
-    idlaboratorio: z
-      .number()
-      .int({ message: 'El Id de laboratorio debe ser un número entero' })
-      .positive({ message: 'El Id de laboratorio debe ser mayor a 0' })
-      .optional(),
+    idlaboratorio: z.string().optional(),
     idusuario: z
       .number()
       .int({ message: 'El Id de usuario debe ser un número entero' })

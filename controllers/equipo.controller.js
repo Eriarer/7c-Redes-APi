@@ -29,7 +29,6 @@ export const addEquipo = async (req, res) => {
       data: newEquipo
     })
   } catch (error) {
-    console.error(error)
     res.status(500).json({
       status: 'error',
       message: 'Algo salió mal, intentalo más tarde'
@@ -50,10 +49,9 @@ export const getEquipos = async (req, res) => {
 
     res.status(200).json({
       status: 'success',
-      data: equipos.filter((equipo) => equipo.activo)
+      data: equipos
     })
   } catch (error) {
-    console.error(error)
     res.status(500).json({
       status: 'error',
       message: 'Algo salió mal, intentalo más tarde'
@@ -79,7 +77,6 @@ export const getEquipoById = async (req, res) => {
       data: equipo
     })
   } catch (error) {
-    console.error(error)
     res.status(500).json({
       status: 'error',
       message: 'Algo salió mal, intentalo más tarde'
@@ -107,7 +104,6 @@ export const deleteEquipo = async (req, res) => {
       message: 'Equipo eliminado exitosamente'
     })
   } catch (error) {
-    console.error(error)
     res.status(500).json({
       status: 'error',
       message: 'Algo salió mal, intentalo más tarde'
@@ -152,7 +148,6 @@ export const updateEquipo = async (req, res) => {
       data: updatedEquipo
     })
   } catch (error) {
-    console.error(error)
     res.status(500).json({
       status: 'error',
       message: 'Algo salió mal, intentalo más tarde'

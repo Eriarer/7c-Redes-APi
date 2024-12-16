@@ -18,7 +18,6 @@ export const addMaterial = async (req, res) => {
       data: material
     })
   } catch (error) {
-    console.log(error)
     res.status(500).json({
       status: 'error',
       message: 'Algo ha salido mal, inténtalo más tarde'
@@ -40,7 +39,6 @@ export const getMateriales = async (req, res) => {
       data: materiales
     })
   } catch (error) {
-    console.log(error)
     res.status(500).json({
       status: 'error',
       message: 'Algo ha salido mal, inténtalo más tarde'
@@ -76,7 +74,6 @@ export const getMaterialById = async (req, res) => {
       data
     })
   } catch (error) {
-    console.log(error)
     res.status(500).json({
       status: 'error',
       message: 'Algo ha salido mal, inténtalo más tarde'
@@ -121,7 +118,6 @@ export const deleteMaterial = async (req, res) => {
       message: 'Material eliminado'
     })
   } catch (error) {
-    console.log(error)
     res.status(500).json({
       status: 'error',
       message: 'Algo ha salido mal, inténtalo más tarde'

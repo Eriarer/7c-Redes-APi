@@ -1,9 +1,9 @@
 import { z } from 'zod'
 
 export const addHorarioServicioSchema = z.object({
-  idlaboratorio: z.number({
+  idlaboratorio: z.string({
     required_error: 'El ID de laboratorio es requerido',
-    invalid_type_error: 'El ID de laboratorio debe ser un número'
+    invalid_type_error: 'El ID de laboratorio debe ser un string'
   }),
   hora_inicio: z
     .string({
@@ -29,7 +29,7 @@ export const addHorarioServicioSchema = z.object({
 
 export const updateHorarioServicioSchema = z.object({
   idlaboratorio: z
-    .number({
+    .string({
       invalid_type_error: 'El ID de laboratorio debe ser un número'
     })
     .optional(),

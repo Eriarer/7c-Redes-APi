@@ -47,7 +47,7 @@ export const addLaboratorio = async (req, res) => {
 
 export const getLaboratorios = async (req, res) => {
   try {
-    const laboratorios = await db.findAll(collections.laboratorio)
+    const laboratorios = await db.getAllDocuments(collections.laboratorio)
 
     if (laboratorios.length === 0) {
       return res.status(404).json({

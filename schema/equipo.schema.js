@@ -9,16 +9,11 @@ export const addEquipoSchema = z.object({
     .string()
     .max(200, { message: 'La descripción no puede exceder 200 caracteres' })
     .optional(),
-  disponible: z
-    .boolean().optional()
+  disponible: z.boolean().optional()
 })
 
 export const updateEquipoSchema = z
   .object({
-    idequipo: z
-      .string()
-      .regex(/^[0-9]+$/, { message: 'El ID debe ser un número entero' })
-      .optional(),
     nombre: z
       .string()
       .min(4, { message: 'El nombre debe tener al menos 4 caracteres' })
@@ -28,7 +23,6 @@ export const updateEquipoSchema = z
       .string()
       .max(200, { message: 'La descripción no puede exceder 200 caracteres' })
       .optional(),
-    disponible: z
-      .boolean().optional()
+    disponible: z.boolean().optional()
   })
   .partial()

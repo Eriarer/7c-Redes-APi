@@ -29,8 +29,6 @@ export const addUsuario = async (req, res) => {
     values.tipo = tipo ? tipo : 'E'
     values.activo = activo ? activo : true
 
-    console.log(values)
-
     const newUser = await db.saveDocument(collections.usuario, values)
 
     res.status(201).json({ status: 'success', data: newUser })
@@ -101,7 +99,6 @@ export const updatePassword = async (req, res) => {
       return res.status(400).json({ error: 'Contraseña incorrecta' })
     }
   } catch (error) {
-    console.log(error)
     return res
       .status(500)
       .json({ error: 'Algo ah salido mal, intentalo más tarde' })
@@ -120,7 +117,6 @@ export const updatePassword = async (req, res) => {
       .status(200)
       .json({ status: 'success', message: 'Contraseña actualizada' })
   } catch (error) {
-    console.log(error)
     res.status(500).json({
       status: 'error',
       message: 'Algo ah salido mal, intentalo más tarde'

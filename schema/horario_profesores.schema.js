@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 export const addHorarioProfesoresSchema = z.object({
-  idlaboratorio: z.number({
+  idlaboratorio: z.string({
     required_error: 'El ID de laboratorio es requerido',
     invalid_type_error: 'El ID de laboratorio debe ser un número'
   }),
@@ -39,7 +39,7 @@ export const addHorarioProfesoresSchema = z.object({
 
 export const updateHorarioProfesoresSchema = z.object({
   idlaboratorio: z
-    .number({
+    .string({
       invalid_type_error: 'El ID de laboratorio debe ser un número'
     })
     .optional(),
