@@ -2,96 +2,147 @@ import JsonDatabase from '../db/db.js'
 import { appConfig } from '../config/config.js'
 import { collections } from '../config/colletion.names.config.js'
 
+// Instancia de la base de datos
 const db = new JsonDatabase(appConfig.dbDirectory)
 await db.init()
-await db.createCollection(collections.equipo)
 
 export const addEquipo = async (req, res) => {
   const { nombre, descripcion, disponible } = req.body
+
   try {
-    let values = { nombre }
-    values.descripcion = descripcion || ''
-    values.disponible = disponible || true
-    const newEquipo = await db.saveDocument('equipos', values)
-    res
-      .status(201)
-      .json({ status: 'success', message: 'Equipo agregado', data: newEquipo })
+    const newEquipo = await db.saveDocument(collections.equipos, {
+      nombre,
+      descripcion,
+      disponible,
+      activo: true // Campo por defecto para representar la disponibilidad del equipo
+    })
+
+    res.status(201).json({
+      status: 'success',
+      message: 'Equipo agregado',
+      data: newEquipo
+    })
   } catch (error) {
-    console.log(error)
-    res.status(500).json({ status: 'error', message: error.message })
+    console.error(error)
+    res.status(500).json({
+      status: 'error',
+      message: 'Algo salió mal, intentalo más tarde'
+    })
   }
 }
 
 export const getEquipos = async (req, res) => {
   try {
-    const equipos = await db.queryDocuments('equipos')
+    const equipos = await db.queryDocuments(collections.equipos)
+
     if (equipos.length === 0) {
-      return res
-        .status(404)
-        .json({ status: 'error', message: 'No hay equipos' })
+      return res.status(404).json({
+        status: 'error',
+        message: 'No hay equipos'
+      })
     }
-    res.status(200).json({ status: 'success', data: equipos })
+
+    res.status(200).json({
+      status: 'success',
+      data: equipos.filter((equipo) => equipo.activo) // Solo equipos activos
+    })
   } catch (error) {
-    console.log(error)
-    res.status(500).json({ status: 'error', message: error.message })
+    console.error(error)
+    res.status(500).json({
+      status: 'error',
+      message: 'Algo salió mal, intentalo más tarde'
+    })
   }
 }
 
 export const getEquipoById = async (req, res) => {
   const { id } = req.params
+
   try {
-    const equipo = await db.getDocument('equipos', id)
-    res.status(200).json(equipo ? [equipo] : [])
+    const equipo = await db.getDocument(collections.equipos, id)
+
+    if (!equipo || !equipo.activo) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'Equipo no encontrado'
+      })
+    }
+
+    res.status(200).json({
+      status: 'success',
+      data: equipo
+    })
   } catch (error) {
-    console.log(error)
-    res.status(500).json({ error: error.message })
+    console.error(error)
+    res.status(500).json({
+      status: 'error',
+      message: 'Algo salió mal, intentalo más tarde'
+    })
   }
 }
 
 export const deleteEquipo = async (req, res) => {
   const { id } = req.params
+
   try {
-    const result = await db.updateDocument('equipos', id, { activo: false })
+    const updatedEquipo = await db.updateDocument(collections.equipos, id, {
+      activo: false
+    })
+
+    if (!updatedEquipo) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'Equipo no encontrado o ya estaba eliminado'
+      })
+    }
+
     res.status(200).json({
       status: 'success',
-      message: 'Equipo eliminado exitosamente',
-      data: result
+      message: 'Equipo eliminado exitosamente'
     })
   } catch (error) {
-    console.log(error)
-    res.status(500).json({ error: error.message })
+    console.error(error)
+    res.status(500).json({
+      status: 'error',
+      message: 'Algo salió mal, intentalo más tarde'
+    })
   }
 }
 
 export const updateEquipo = async (req, res) => {
-  const { idEquipo, nombre, descripcion, activo } = req.body
+  const { id } = req.params
+  const { nombre, descripcion, disponible } = req.body
+
   const updateData = {}
-  if (nombre) updateData.nombre = nombre
-  if (descripcion) updateData.descripcion = descripcion
-  if (activo) updateData.activo = activo
 
-  if (Object.keys(updateData).length === 0) {
-    return res.status(400).json({ error: 'Datos insuficientes' })
-  }
-
-  if (!idEquipo) return res.status(400).json({ error: 'IdEquipo es requerido' })
+  if (nombre !== undefined) updateData.nombre = nombre
+  if (descripcion !== undefined) updateData.descripcion = descripcion
+  if (disponible !== undefined) updateData.disponible = disponible
 
   try {
     const updatedEquipo = await db.updateDocument(
-      'equipos',
-      idEquipo,
+      collections.equipos,
+      id,
       updateData
     )
+
     if (!updatedEquipo) {
-      throw new Error('Hubo un error al actualizar el equipo')
+      return res.status(404).json({
+        status: 'error',
+        message: 'Equipo no encontrado o no se pudo actualizar'
+      })
     }
+
     res.status(200).json({
       status: 'success',
-      message: 'Equipo actualizado',
+      message: 'Equipo actualizado exitosamente',
       data: updatedEquipo
     })
   } catch (error) {
-    console.log(error)
-    res.status(500).json({ error: error.message })
+    console.error(error)
+    res.status(500).json({
+      status: 'error',
+      message: 'Algo salió mal, intentalo más tarde'
+    })
   }
 }
