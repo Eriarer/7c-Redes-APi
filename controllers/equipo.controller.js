@@ -2,20 +2,26 @@ import JsonDatabase from '../db/db.js'
 import { appConfig } from '../config/config.js'
 import { collections } from '../config/colletion.names.config.js'
 
-// Instancia de la base de datos
 const db = new JsonDatabase(appConfig.dbDirectory)
 await db.init()
+await db.createCollection(collections.equipo)
 
 export const addEquipo = async (req, res) => {
   const { nombre, descripcion, disponible } = req.body
 
   try {
-    const newEquipo = await db.saveDocument(collections.equipos, {
+    const newEquipo = await db.saveDocument(collections.equipo, {
       nombre,
-      descripcion,
-      disponible,
-      activo: true // Campo por defecto para representar la disponibilidad del equipo
+      descripcion: descripcion ?? '',
+      disponible: disponible ?? true
     })
+
+    if (!newEquipo) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'No se pudo agregar el equipo'
+      })
+    }
 
     res.status(201).json({
       status: 'success',
@@ -33,7 +39,7 @@ export const addEquipo = async (req, res) => {
 
 export const getEquipos = async (req, res) => {
   try {
-    const equipos = await db.queryDocuments(collections.equipos)
+    const equipos = await db.getAllDocuments(collections.equipo)
 
     if (equipos.length === 0) {
       return res.status(404).json({
@@ -44,7 +50,7 @@ export const getEquipos = async (req, res) => {
 
     res.status(200).json({
       status: 'success',
-      data: equipos.filter((equipo) => equipo.activo) // Solo equipos activos
+      data: equipos.filter((equipo) => equipo.activo)
     })
   } catch (error) {
     console.error(error)
@@ -59,7 +65,7 @@ export const getEquipoById = async (req, res) => {
   const { id } = req.params
 
   try {
-    const equipo = await db.getDocument(collections.equipos, id)
+    const equipo = await db.getDocument(collections.equipo, id)
 
     if (!equipo || !equipo.activo) {
       return res.status(404).json({
@@ -85,7 +91,7 @@ export const deleteEquipo = async (req, res) => {
   const { id } = req.params
 
   try {
-    const updatedEquipo = await db.updateDocument(collections.equipos, id, {
+    const updatedEquipo = await db.updateDocument(collections.equipo, id, {
       activo: false
     })
 
@@ -115,13 +121,20 @@ export const updateEquipo = async (req, res) => {
 
   const updateData = {}
 
-  if (nombre !== undefined) updateData.nombre = nombre
-  if (descripcion !== undefined) updateData.descripcion = descripcion
-  if (disponible !== undefined) updateData.disponible = disponible
+  if (nombre) updateData.nombre = nombre
+  if (descripcion) updateData.descripcion = descripcion
+  if (disponible) updateData.disponible = disponible
+
+  if (Object.keys(updateData).length === 0) {
+    return res.status(400).json({
+      status: 'error',
+      message: 'No se proporcionaron datos para actualizar'
+    })
+  }
 
   try {
     const updatedEquipo = await db.updateDocument(
-      collections.equipos,
+      collections.equipo,
       id,
       updateData
     )

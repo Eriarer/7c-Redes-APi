@@ -1,33 +1,37 @@
 import argon2 from 'argon2'
-import { pool } from '../db/db.js'
+import JsonDatabase from '../db/db.js'
 import { generateToken } from '../middleware/jwt.middleware.js'
+import { appConfig } from '../config/config.js'
+import { collections } from '../config/colletion.names.config.js'
+
+const db = new JsonDatabase(appConfig.dbDirectory)
+await db.init()
+await db.createCollection(collections.usuario)
 
 export const login = async (req, res) => {
   const { correo, password } = req.body
   try {
-    const [results] = await pool.query(
-      'SELECT * FROM usuario WHERE correo = ?',
-      [correo]
-    )
-    if (results.length === 0) {
+    const users = await db.getAllDocuments('usuarios', { correo })
+    if (users.length === 0) {
       return res.status(400).json({ error: 'Correo o contraseña incorrecta' })
     }
-    if (results[0].activo == 0) {
+    const user = users[0]
+    if (!user.activo) {
       return res.status(400).json({
         error: 'No puedes ingresar con esta cuenta, esta desactivada.'
       })
     }
-    if (!(await argon2.verify(results[0].password, password))) {
+    if (!(await argon2.verify(user.password, password))) {
       return res.status(400).json({ error: 'Correo o contraseña incorrecta' })
     }
-    const token = generateToken(results[0])
+    const token = generateToken(user)
     const data = {
-      idusuario: results[0].idusuario,
-      nombre: results[0].nombre,
-      apellido: results[0].apellido,
-      carrera: results[0].carrera,
-      correo: results[0].correo,
-      tipo: results[0].tipo
+      idusuario: user.idusuario,
+      nombre: user.nombre,
+      apellido: user.apellido,
+      carrera: user.carrera,
+      correo: user.correo,
+      tipo: user.tipo
     }
     res.status(200).json({ status: 'success', token, data: data })
   } catch (error) {

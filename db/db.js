@@ -54,6 +54,24 @@ class JsonDatabase {
     }
   }
 
+  async getAllDocuments(collection) {
+    const collectionPath = path.join(this.dbPath, collection)
+    try {
+      const files = await fs.readdir(collectionPath)
+      const documents = await Promise.all(
+        files.map(async (file) => {
+          const filePath = path.join(collectionPath, file)
+          const rawData = await fs.readFile(filePath, 'utf-8')
+          return JSON.parse(rawData)
+        })
+      )
+      return documents
+    } catch (error) {
+      if (error.code === 'ENOENT') return []
+      throw error
+    }
+  }
+
   async updateDocument(collection, id, updateData) {
     const documentPath = path.join(this.dbPath, collection, `${id}.json`)
 

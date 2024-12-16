@@ -1,6 +1,5 @@
 import express from 'express'
 import cors from 'cors'
-import swaggerUi from 'swagger-ui-express'
 import morgan from 'morgan'
 import equipo from './routes/equipo.routes.js'
 import horario_profesoresRoutes from './routes/horario_profesores.routes.js'
@@ -12,7 +11,6 @@ import materialRoutes from './routes/material.routes.js'
 import prestamoRoutes from './routes/prestamo.routes.js'
 import usuarioRoutes from './routes/usuario.routes.js'
 import authRoutes from './routes/auth.routes.js'
-import swaggerSpec from './swagger.js'
 
 const app = express()
 
@@ -32,7 +30,6 @@ app.use('/prestamo', prestamoRoutes)
 app.use('/usuario', usuarioRoutes)
 app.use('/auth', authRoutes)
 
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
 app.get('/', (req, res) => {
   res.status(404).json({ status: 'error', message: 'Ruta no encontrada' })
 })

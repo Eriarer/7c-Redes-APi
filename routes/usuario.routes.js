@@ -2,14 +2,16 @@ import express from 'express'
 import { validateSchema } from '../middleware/validateSchema.middleware.js'
 import {
   addUsuarioSchema,
-  updateUsuarioSchema
+  updateUsuarioSchema,
+  updatePasswordSchema
 } from '../schema/usuario.schema.js'
 import {
   addUsuario,
   deleteUsuario,
   updateUsuario,
   getUsuarios,
-  getUsuarioById
+  getUsuarioById,
+  updatePassword
 } from '../controllers/usuario.controller.js'
 
 const router = express.Router()
@@ -18,10 +20,15 @@ router.post('/create', validateSchema(addUsuarioSchema), addUsuario)
 
 router.delete('/delete/:id', deleteUsuario)
 
-router.patch('/update/:id', validateSchema(updateUsuarioSchema), updateUsuario)
+router.post('/update/:id', validateSchema(updateUsuarioSchema), updateUsuario)
+router.post(
+  '/update/password/:id',
+  validateSchema(updatePasswordSchema),
+  updatePassword
+)
 
-router.get('/find', getUsuarios)
+router.get('/get', getUsuarios)
 
-router.get('/find/:id', getUsuarioById)
+router.get('/get/:id', getUsuarioById)
 
 export default router

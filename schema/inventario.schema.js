@@ -1,31 +1,39 @@
 import { z } from 'zod'
 
-export const InventarioSchema = z.object({
-  id_equipo: z
-    .string({
-      required_error: 'El id del equipo es requerido'
-    })
-    .max(6, 'El id del equipo debe tener a lo sumo 6 caracteres'),
-  id_lab: z
-    .string({
-      required_error: 'El id del laboratorio es requerido'
-    })
-    .max(6, 'El id del laboratorio debe tener a lo sumo 6 caracteres'),
+export const addInventarioSchema = z.object({
+  idlaboratorio: z.number({
+    required_error: 'El ID de laboratorio es requerido',
+    invalid_type_error: 'El ID de laboratorio debe ser un número'
+  }),
+  idunidad: z.number({
+    required_error: 'El ID de unidad es requerido',
+    invalid_type_error: 'El ID de unidad debe ser un número'
+  }),
   cantidad: z
     .number({
-      required_error: 'La cantidad es requerida'
+      required_error: 'La cantidad es requerida',
+      invalid_type_error: 'La cantidad debe ser un número'
     })
-    .int('La cantidad debe ser un número entero'),
-  activo: z.boolean().default(true)
+    .int({ message: 'La cantidad debe ser un número entero' })
+    .min(1, { message: 'La cantidad debe ser al menos 1' })
 })
 
-export const UpdateInventarioSchema = z.object({
-  id_equipo: z
-    .string({})
-    .max(6, 'El id del equipo debe tener a lo sumo 6 caracteres'),
-  id_lab: z
-    .string({})
-    .max(6, 'El id del laboratorio debe tener a lo sumo 6 caracteres'),
-  cantidad: z.number({}).int('La cantidad debe ser un número entero'),
-  activo: z.boolean()
+export const updateInventarioSchema = z.object({
+  idlaboratorio: z
+    .number({
+      invalid_type_error: 'El ID de laboratorio debe ser un número'
+    })
+    .optional(),
+  idunidad: z
+    .number({
+      invalid_type_error: 'El ID de unidad debe ser un número'
+    })
+    .optional(),
+  cantidad: z
+    .number({
+      invalid_type_error: 'La cantidad debe ser un número'
+    })
+    .int({ message: 'La cantidad debe ser un número entero' })
+    .min(1, { message: 'La cantidad debe ser al menos 1' })
+    .optional()
 })

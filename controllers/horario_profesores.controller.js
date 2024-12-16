@@ -4,9 +4,8 @@ import { collections } from '../config/colletion.names.config.js'
 
 const db = new JsonDatabase(appConfig.dbDirectory)
 await db.init()
-await db.createCollection(collections.horariosProfesores)
+await db.createCollection(collections.hoarioProfesor)
 
-// Agregar un horario de profesor
 export const addHorarioProfesor = async (req, res) => {
   const {
     idlaboratorio,
@@ -18,15 +17,21 @@ export const addHorarioProfesor = async (req, res) => {
   } = req.body
 
   try {
-    const newHorario = await db.saveDocument('horariosProfesores', {
+    const newHorario = await db.saveDocument(collections.hoarioProfesor, {
       idlaboratorio,
       idusuario,
       hora_inicio,
       hora_cierre,
       dias,
-      descripcion,
-      activo: true
+      descripcion
     })
+
+    if (!newHorario) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'No se pudo agregar el horario de profesor'
+      })
+    }
 
     res.status(201).json({
       status: 'success',
@@ -43,7 +48,7 @@ export const addHorarioProfesor = async (req, res) => {
 
 export const getHorariosProfesores = async (req, res) => {
   try {
-    const horarios = await db.queryDocuments('horariosProfesores')
+    const horarios = await db.getAllDocuments(collections.hoarioProfesor)
 
     if (horarios.length === 0) {
       return res
@@ -53,7 +58,7 @@ export const getHorariosProfesores = async (req, res) => {
 
     res.status(200).json({
       status: 'success',
-      data: horarios.filter((horario) => horario.activo !== false)
+      data: horarios
     })
   } catch (error) {
     console.error('Error al obtener horarios:', error)
@@ -64,13 +69,13 @@ export const getHorariosProfesores = async (req, res) => {
 }
 
 // Obtener un horario de profesor por ID
-export const getHorarioProfesorById = async (req, res) => {
+export const getHorarioProfesor = async (req, res) => {
   const { id } = req.params
 
   try {
-    const horario = await db.getDocument('horariosProfesores', id)
+    const horario = await db.getDocument(collections.hoarioProfesor, id)
 
-    if (!horario || horario.activo === false) {
+    if (!horario) {
       return res
         .status(404)
         .json({ status: 'error', message: 'Horario no encontrado' })
@@ -119,7 +124,7 @@ export const updateHorarioProfesor = async (req, res) => {
 
   try {
     const updatedHorario = await db.updateDocument(
-      'horariosProfesores',
+      collections.hoarioProfesor,
       id,
       updateData
     )
@@ -144,16 +149,12 @@ export const updateHorarioProfesor = async (req, res) => {
   }
 }
 
-// Eliminar (desactivar) un horario de profesor
 export const deleteHorarioProfesor = async (req, res) => {
   const { id } = req.params
 
   try {
-    const result = await db.updateDocument('horariosProfesores', id, {
-      activo: false
-    })
-
-    if (!result) {
+    const deleted = await db.deleteDocument(collections.hoarioProfesor, id)
+    if (!deleted) {
       return res.status(404).json({
         status: 'error',
         message: 'Horario no encontrado o no se pudo eliminar'

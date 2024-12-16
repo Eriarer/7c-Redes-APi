@@ -1,41 +1,27 @@
 import { z } from 'zod'
 
-export const MaterialSchema = z.object({
-  id_lab: z
-    .string({
-      required_error: 'El id del laboratorio es requerido'
-    })
-    .max(6, 'El id del laboratorio debe tener a lo sumo 6 caracteres'),
-  id_prestamo: z
-    .string({
-      required_error: 'El id del préstamo es requerido'
-    })
-    .max(6, 'El id del préstamo debe tener a lo sumo 6 caracteres'),
-  id_usuario: z
-    .string({
-      required_error: 'El id del usuario es requerido'
-    })
-    .max(6, 'El id del usuario debe tener a lo sumo 6 caracteres'),
-  id_equipo: z
-    .string({
-      required_error: 'El id del equipo es requerido'
-    })
-    .max(6, 'El id del equipo debe tener a lo sumo 6 caracteres'),
-  activo: z.boolean().default(true)
+export const addMaterialSchema = z.object({
+  idprestamo: z
+    .number({ message: 'El Id de préstamo es requerido' })
+    .int({ message: 'El Id de préstamo debe ser un número entero' })
+    .positive({ message: 'El Id de préstamo debe ser mayor a 0' }),
+  idlaboratorio: z
+    .number({ message: 'El Id de laboratorio es requerido' })
+    .int({ message: 'El Id de laboratorio debe ser un número entero' })
+    .positive({ message: 'El Id de laboratorio debe ser mayor a 0' }),
+  idunidad: z
+    .number({ message: 'El Id de unidad es requerido' })
+    .int({ message: 'El Id de unidad debe ser un número entero' })
+    .positive({ message: 'El Id de unidad debe ser mayor a 0' }),
+  cantidad: z
+    .number({ message: 'La cantidad es requerida' })
+    .int({ message: 'La cantidad debe ser un número entero' })
+    .positive({ message: 'La cantidad debe ser mayor a 0' })
 })
 
-export const UpdateMaterialSchema = z.object({
-  id_lab: z
-    .string({})
-    .max(6, 'El id del laboratorio debe tener a lo sumo 6 caracteres'),
-  id_prestamo: z
-    .string({})
-    .max(6, 'El id del préstamo debe tener a lo sumo 6 caracteres'),
-  id_usuario: z
-    .string({})
-    .max(6, 'El id del usuario debe tener a lo sumo 6 caracteres'),
-  id_equipo: z
-    .string({})
-    .max(6, 'El id del equipo debe tener a lo sumo 6 caracteres'),
-  activo: z.boolean()
+export const updateMaterialSchema = z.object({
+  cantidad: z
+    .number({ message: 'La cantidad es requerida' })
+    .int({ message: 'La cantidad debe ser un número entero' })
+    .positive({ message: 'La cantidad debe ser mayor a 0' })
 })
