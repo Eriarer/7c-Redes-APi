@@ -16,7 +16,6 @@ export const addPrestamo = async (req, res) => {
     observaciones,
     materiales
   } = req.body
-
   try {
     const newPrestamo = await db.saveDocument(collections.prestamo, {
       idlaboratorio,
@@ -24,7 +23,8 @@ export const addPrestamo = async (req, res) => {
       fecha,
       horainicio,
       duracion,
-      observaciones: observaciones ?? ''
+      observaciones: observaciones ?? '',
+      estado: 'P'
     })
     if (!newPrestamo) {
       return res.status(400).json({
@@ -132,7 +132,6 @@ export const getPrestamoById = async (req, res) => {
 
 export const getPrestamoByIdUsuario = async (req, res) => {
   const { idusuario } = req.params
-
   try {
     const prestamos = await db.getAllDocuments(collections.prestamo)
 
@@ -142,9 +141,8 @@ export const getPrestamoByIdUsuario = async (req, res) => {
         message: 'No hay prestamos'
       })
     }
-
     const userPrestamos = prestamos.filter(
-      (prestamo) => prestamo.idusuario === idusuario
+      (prestamo) => prestamo.idusuario == idusuario
     )
 
     if (userPrestamos.length === 0) {
@@ -154,12 +152,21 @@ export const getPrestamoByIdUsuario = async (req, res) => {
       })
     }
 
+    const laboratorios = await db.getAllDocuments(collections.laboratorio)
+
+    const mergedData = userPrestamos.map((prestamo) => {
+      const lab = laboratorios.find((lab) => lab._id == prestamo.idlaboratorio)
+      return {
+        ...prestamo,
+        laboratorio: lab
+      }
+    })
+
     res.status(200).json({
       status: 'success',
-      data: userPrestamos
+      data: mergedData
     })
   } catch (error) {
-    console.error('Error al obtener prestamos por ID de usuario:', error)
     res.status(500).json({
       status: 'error',
       message: 'Algo ha salido mal, inténtalo más tarde'

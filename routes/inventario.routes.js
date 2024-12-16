@@ -4,6 +4,7 @@ import {
   addInventario,
   getInventarios,
   getInventarioById,
+  getInventarioFromLab,
   deleteInventario,
   updateInventario
 } from '../controllers/inventario.controller.js'
@@ -17,6 +18,7 @@ const router = express.Router()
 router.post('/create', validateSchema(addInventarioSchema), addInventario)
 
 router.get('/get', getInventarios)
+router.get('/get/:idlaboratorio', getInventarioFromLab)
 router.get('/get/:idlaboratorio/:idunidad', getInventarioById)
 
 router.delete('/delete/:idlaboratorio/:idunidad', deleteInventario)

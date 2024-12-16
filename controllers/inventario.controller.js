@@ -54,6 +54,39 @@ export const getInventarios = async (req, res) => {
   }
 }
 
+export const getInventarioFromLab = async (req, res) => {
+  const { idlaboratorio } = req.params
+  try {
+    const inventarios = await db.getAllDocuments(collections.inventario)
+    if (inventarios.length === 0) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'No hay inventarios'
+      })
+    }
+    const foundInventarios = inventarios.filter(
+      (inv) => inv.idlaboratorio === idlaboratorio
+    )
+
+    if (foundInventarios.length === 0) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'Inventario no encontrado'
+      })
+    }
+
+    res.status(200).json({
+      status: 'success',
+      data: foundInventarios
+    })
+  } catch (error) {
+    res.status(500).json({
+      status: 'error',
+      message: 'Algo ah salido mal, intentalo más tarde'
+    })
+  }
+}
+
 export const getInventarioById = async (req, res) => {
   const { idlaboratorio, idunidad } = req.params
 

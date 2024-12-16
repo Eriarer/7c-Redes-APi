@@ -29,9 +29,6 @@ export const addPrestamoSchema = z.object({
     .length(1, { message: 'El estado debe ser un carácter' })
     .regex(/^[PCADF]$/, { message: 'El estado debe ser P, C, A, D o F' })
     .default('P') // Valor predeterminado 'P'
-    .optional(),
-  materiales: z
-    .array({ message: 'Los materiales deben ser un arreglo de objetos' })
     .optional()
 })
 
